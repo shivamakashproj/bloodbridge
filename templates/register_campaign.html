@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register for Drive — BloodBridge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            background: #080d1a;
+            color: #f8fafc;
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+        }
+        .camp-header {
+            background: linear-gradient(135deg, rgba(225, 29, 72, 0.15), rgba(15, 23, 42, 0.85));
+            border: 1px solid rgba(225, 29, 72, 0.3);
+            border-radius: 16px;
+        }
+        .form-card {
+            background: rgba(17, 24, 39, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            backdrop-filter: blur(16px);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-pro sticky-top">
+        <div class="container">
+            <a class="navbar-brand text-red-accent fw-bold fs-3" href="{{ url_for('index') }}">
+                <i class="bi bi-droplet-fill me-2"></i>BloodBridge
+            </a>
+            <div class="ms-auto d-flex gap-2">
+                <a href="{{ url_for('index') }}" class="btn btn-sm btn-outline-light rounded-pill px-3">Home</a>
+                <a href="{{ url_for('profile') }}" class="btn btn-sm btn-outline-danger rounded-pill px-3">My Profile</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                
+                <!-- Drive Info Banner -->
+                <div class="camp-header p-4 mb-4">
+                    <span class="badge bg-danger rounded-pill px-3 py-1 mb-2 fw-semibold">
+                        <i class="bi bi-calendar-event me-1"></i> Donation Camp Slot
+                    </span>
+                    <h3 class="fw-bold mb-2 text-white">{{ campaign.title }}</h3>
+                    <div class="row g-2 mt-2 small" style="color: #cbd5e1;">
+                        <div class="col-sm-6"><i class="bi bi-building text-danger me-2"></i><strong>Host:</strong> {{ campaign.host_name or 'BloodBridge Partner' }}</div>
+                        <div class="col-sm-6"><i class="bi bi-calendar-check text-danger me-2"></i><strong>Date:</strong> {{ campaign.date.strftime('%d %B %Y') }}</div>
+                        <div class="col-sm-6"><i class="bi bi-clock text-danger me-2"></i><strong>Time:</strong> {{ campaign.time_start.strftime('%I:%M %p') }} - {{ campaign.time_end.strftime('%I:%M %p') }}</div>
+                        <div class="col-sm-6"><i class="bi bi-geo-alt-fill text-danger me-2"></i><strong>Location:</strong> {{ campaign.location }}, {{ campaign.city }}</div>
+                    </div>
+                </div>
+
+                <!-- Registration Form -->
+                <div class="form-card p-4 p-md-5">
+                    <h4 class="fw-bold text-white mb-4"><i class="bi bi-person-vcard text-danger me-2"></i>Donor Registration</h4>
+                    
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                      {% if messages %}{% for cat, msg in messages %}
+                        <div class="alert alert-{{ cat }} mb-3">{{ msg }}</div>
+                      {% endfor %}{% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('register_campaign', campaign_id=campaign.id) }}">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label-pro">Full Name <span class="text-danger">*</span></label>
+                                <input type="text" name="donor_name" class="form-control form-control-pro" value="{{ donor.full_name if donor else current_user.username }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label-pro">Contact Phone <span class="text-danger">*</span></label>
+                                <input type="tel" name="phone" class="form-control form-control-pro" value="{{ donor.phone if donor else '' }}" placeholder="10-digit mobile number" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label-pro">Blood Group <span class="text-danger">*</span></label>
+                                <select name="blood_group" class="form-select form-select-pro" required>
+                                    <option value="" disabled {% if not donor %}selected{% endif %}>Select Group</option>
+                                    {% for bg in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+                                        <option value="{{ bg }}" {% if donor and donor.blood_group == bg %}selected{% endif %}>{{ bg }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label-pro">Age (18-65) <span class="text-danger">*</span></label>
+                                <input type="number" name="age" class="form-control form-control-pro" min="18" max="65" value="22" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label-pro">City <span class="text-danger">*</span></label>
+                                <input type="text" name="city" class="form-control form-control-pro" value="{{ donor.city if donor else campaign.city }}" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label-pro">Address / Campus Department</label>
+                                <input type="text" name="address" class="form-control form-control-pro" placeholder="e.g. Block B, Computer Science Dept.">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label-pro">Medical Notes (Optional)</label>
+                                <textarea name="medical_notes" class="form-control form-control-pro" rows="2" placeholder="Any allergies, recent donations, or dietary notes"></textarea>
+                            </div>
+                            <div class="col-12 mt-4">
+                                <button type="submit" class="btn btn-red-glow w-100 py-3 rounded-pill fw-bold fs-6">
+                                    Confirm Drive Registration <i class="bi bi-check-circle-fill ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

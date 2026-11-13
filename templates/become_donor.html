@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Become a Blood Donor — BloodBridge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-pro sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-3 text-red-accent" href="{{ url_for('index') }}">
+                <i class="bi bi-droplet-fill me-2 heartbeat"></i>BloodBridge
+            </a>
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <a href="{{ url_for('index') }}" class="btn btn-sm btn-outline-light rounded-pill px-3">Home</a>
+                <a href="{{ url_for('profile') }}" class="btn btn-sm btn-outline-danger rounded-pill px-3">Profile</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                
+                <!-- Hero Header -->
+                <div class="p-4 rounded-4 mb-4" style="background: linear-gradient(135deg, rgba(225,29,72,0.18), rgba(15,23,42,0.9)); border: 1px solid rgba(225,29,72,0.3);">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="blood-group-pill flex-shrink-0" style="width:56px;height:56px;font-size:1.5rem;">
+                            <i class="bi bi-heart-fill"></i>
+                        </div>
+                        <div>
+                            <span class="badge bg-danger rounded-pill px-3 py-1 mb-1 fw-bold">HERO REGISTRATION</span>
+                            <h4 class="fw-bold mb-0 text-white">Join the Lifesaver Donor Community</h4>
+                            <p class="text-muted small mb-0">Help patients in emergency surgeries, trauma, and thalassemia treatments in your city.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Card -->
+                <div class="glass-panel p-4 p-md-5">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                      {% if messages %}
+                        {% for cat, msg in messages %}
+                          <div class="alert-pro alert-pro-{{ cat if cat != 'message' else 'info' }} mb-4">{{ msg }}</div>
+                        {% endfor %}
+                      {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('become_donor') }}">
+                        <div class="row g-4">
+                            
+                            <div class="col-12">
+                                <h6 class="text-uppercase text-red-accent fw-bold letter-spacing-1 small mb-0">
+                                    <i class="bi bi-person-badge-fill me-1"></i> Donor Information
+                                </h6>
+                                <hr class="border-secondary my-2">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label-pro">Full Name <span class="text-danger">*</span></label>
+                                <input type="text" name="full_name" class="form-control form-control-pro" value="{{ current_user.username }}" required autofocus>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label-pro">Blood Group <span class="text-danger">*</span></label>
+                                <select name="blood_group" class="form-select form-select-pro" required>
+                                    <option value="" disabled selected>Select Your Blood Group</option>
+                                    <option value="A+">A+ (A Positive)</option>
+                                    <option value="A-">A- (A Negative)</option>
+                                    <option value="B+">B+ (B Positive)</option>
+                                    <option value="B-">B- (B Negative)</option>
+                                    <option value="AB+">AB+ (AB Positive)</option>
+                                    <option value="AB-">AB- (AB Negative)</option>
+                                    <option value="O+">O+ (O Positive)</option>
+                                    <option value="O-">O- (Universal Donor)</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label-pro">Contact Phone Number <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-transparent border-secondary text-muted"><i class="bi bi-telephone"></i></span>
+                                    <input type="tel" name="phone" class="form-control form-control-pro" 
+                                           placeholder="e.g. 9876543210" 
+                                           pattern="^(\+91[\-\s]?)?[0]?[6-9]\d{9}$" 
+                                           title="Please enter a valid 10-digit mobile number (e.g. 9876543210 or +91 9876543210)" 
+                                           required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label-pro">City / Resident Location <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-transparent border-secondary text-muted"><i class="bi bi-geo-alt"></i></span>
+                                    <input type="text" name="city" class="form-control form-control-pro" placeholder="e.g. Hyderabad, Pune, Mumbai" required>
+                                </div>
+                            </div>
+
+                            <!-- Health Eligibility Checklist -->
+                            <div class="col-12 mt-4">
+                                <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 small text-muted">
+                                    <strong class="text-white d-block mb-2"><i class="bi bi-check2-circle text-success me-1"></i> Basic Donor Eligibility Checklist:</strong>
+                                    <ul class="mb-0 ps-3 space-y-1">
+                                        <li>Age between 18 and 65 years</li>
+                                        <li>Weight is 45 kg or above</li>
+                                        <li>No major illness or surgery in the last 6 months</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="col-12 mt-3">
+                                <button type="submit" class="btn btn-red-glow w-100 py-3 rounded-pill fw-bold fs-6">
+                                    <i class="bi bi-heart-fill me-2"></i> Register as a Lifesaver Donor
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

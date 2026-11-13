@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Emergency Blood Request — BloodBridge</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom Healthcare Styling -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .request-banner {
+            background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 40%, #dc2626 100%);
+            color: #ffffff;
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            overflow: hidden;
+        }
+        .form-card-clinical {
+            background: #ffffff;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            padding: 36px;
+            box-shadow: var(--shadow-lg);
+        }
+        .side-info-card {
+            background: #ffffff;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            padding: 28px;
+            box-shadow: var(--shadow-sm);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. Emergency Hotline Topbar -->
+    <div class="topbar-emergency">
+        <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <i class="bi bi-telephone-inbound-fill me-2"></i>24/7 Critical Blood Dispatch Helpline: 
+                <a href="tel:+917091379965" class="fw-bold ms-1 text-decoration-underline">+91 7091379965</a>
+            </div>
+            <div class="d-none d-md-flex gap-3">
+                <a href="{{ url_for('index') }}"><i class="bi bi-house me-1"></i>Home</a>
+                <a href="{{ url_for('my_requests') }}"><i class="bi bi-list-check me-1"></i>Track My Requests</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-clinical sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+                <i class="bi bi-droplet-fill me-2 heartbeat"></i>
+                <span>Blood<span style="color: #0f172a;">Bridge</span></span>
+            </a>
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <a href="{{ url_for('my_requests') }}" class="btn btn-outline-red btn-sm">My Requests</a>
+                <a href="{{ url_for('profile') }}" class="btn btn-primary-red btn-sm">My Profile</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 3. Header Hero Banner -->
+    <div class="container mt-4">
+        <div class="request-banner">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-8">
+                    <span class="hero-badge-pill mb-3">
+                        <i class="bi bi-broadcast"></i> Priority Emergency Intake
+                    </span>
+                    <h1 class="display-6 fw-bold mb-2">Post an Urgent Patient Blood Requisition</h1>
+                    <p class="mb-0 text-white text-opacity-90 lead" style="font-size: 1.05rem;">
+                        Submissions are broadcasted immediately to nearby voluntary donors and participating blood banks upon administrative verification.
+                    </p>
+                </div>
+                <div class="col-lg-4 text-center text-lg-end d-none d-lg-block">
+                    <img src="{{ url_for('static', filename='images/doctor-team.jpg') }}" alt="Medical Emergency" class="rounded-4 shadow-lg border border-2 border-white border-opacity-25" style="width: 220px; height: 130px; object-fit: cover;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Form & Guidelines Two-Column Layout -->
+    <div class="container py-5">
+        <div class="row g-4">
+            
+            <!-- Left: Form -->
+            <div class="col-lg-8">
+                <div class="form-card-clinical">
+                    <h4 class="fw-bold text-dark mb-1">Emergency Patient Details</h4>
+                    <p class="text-muted small mb-4">Please provide accurate patient and hospital information for rapid verification.</p>
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                      {% if messages %}
+                        {% for cat, msg in messages %}
+                          <div class="alert alert-{{ cat if cat != 'message' else 'info' }} alert-dismissible fade show mb-4" role="alert">
+                            {{ msg }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                          </div>
+                        {% endfor %}
+                      {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('request_blood') }}">
+                        <div class="row g-3">
+                            <div class="col-md-7">
+                                <label class="form-label text-dark small fw-semibold">Patient Full Name <span class="text-danger">*</span></label>
+                                <input type="text" name="patient_name" class="form-control clinical-control" placeholder="e.g. Ramesh Chandra" required autofocus>
+                            </div>
+
+                            <div class="col-md-5">
+                                <label class="form-label text-dark small fw-semibold">Blood Group Required <span class="text-danger">*</span></label>
+                                <select name="blood_group_required" class="form-select clinical-control" required>
+                                    <option value="" disabled selected>Select Blood Group</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label text-dark small fw-semibold">Units Required (Pints) <span class="text-danger">*</span></label>
+                                <input type="number" name="units_required" class="form-control clinical-control" min="1" max="20" value="1" required>
+                            </div>
+
+                            <div class="col-md-8">
+                                <label class="form-label text-dark small fw-semibold">Hospital Name & Branch <span class="text-danger">*</span></label>
+                                <input type="text" name="hospital_name" class="form-control clinical-control" placeholder="e.g. AIIMS Trauma Center / Apollo Greams Road" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label text-dark small fw-semibold">Hospital City <span class="text-danger">*</span></label>
+                                <input type="text" name="city" class="form-control clinical-control" placeholder="e.g. New Delhi, Mumbai, Bengaluru" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label text-dark small fw-semibold">Attendant Emergency Contact Phone <span class="text-danger">*</span></label>
+                                <input type="tel" name="contact_phone" class="form-control clinical-control" placeholder="+91 98765 43210" required>
+                            </div>
+
+                            <div class="col-12 mt-4">
+                                <button type="submit" class="btn btn-primary-red w-100 py-3 fw-bold">
+                                    <i class="bi bi-broadcast me-2"></i> Broadcast Emergency Blood Requisition
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right: Verification & Guidelines -->
+            <div class="col-lg-4">
+                <div class="side-info-card mb-4">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <i class="bi bi-shield-fill-check text-danger fs-4"></i>
+                        <h5 class="fw-bold text-dark mb-0">Emergency Guidelines</h5>
+                    </div>
+                    <ul class="list-unstyled small text-muted mb-0">
+                        <li class="mb-2"><i class="bi bi-check2 text-success me-1"></i> Provide exact hospital bed / IPD details to attending donors.</li>
+                        <li class="mb-2"><i class="bi bi-check2 text-success me-1"></i> Ensure patient blood grouping has been verified via clinical requisition slip.</li>
+                        <li class="mb-2"><i class="bi bi-check2 text-success me-1"></i> Keep your contact phone line reachable 24x7 for coordinator callbacks.</li>
+                        <li><i class="bi bi-check2 text-success me-1"></i> BloodBridge is 100% voluntary — never pay any monetary fee to any donor.</li>
+                    </ul>
+                </div>
+
+                <div class="side-info-card text-center">
+                    <img src="{{ url_for('static', filename='images/donor-care.jpg') }}" alt="Blood Care" class="rounded-3 img-fluid mb-3" style="height: 160px; width: 100%; object-fit: cover;">
+                    <h6 class="fw-bold text-dark mb-1">Need Urgent Consultation?</h6>
+                    <p class="text-muted small mb-3">Our 24x7 emergency helpline coordinators are available around the clock.</p>
+                    <a href="tel:+917091379965" class="btn btn-outline-red w-100 btn-sm">
+                        <i class="bi bi-telephone-fill me-1"></i> +91 7091379965
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 5. Footer -->
+    <footer class="footer-clinical">
+        <div class="container text-center">
+            <p class="mb-1 text-white fw-bold">BloodBridge Healthcare Network</p>
+            <p class="small text-white mb-0" style="opacity: 0.9;">&copy; 2026 BloodBridge India. Connecting patients with voluntary donors 24/7.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

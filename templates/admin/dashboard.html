@@ -1,0 +1,385 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+<div class="container-fluid py-4" style="background: transparent; min-height: 100vh;">
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show rounded-4 shadow-lg mb-4 text-white" 
+             style="background: rgba(15, 23, 42, 0.95); border: 1px solid var(--bb-border);" role="alert">
+          <i class="bi bi-info-circle-fill text-danger mr-2"></i> {{ message }}
+          <button type="button" class="close text-white" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <!-- 1. Executive Telemetry Command Header Banner -->
+  <div class="command-hero-card mb-4">
+    <div class="row align-items-center position-relative z-1">
+      <div class="col-lg-8">
+        <div class="d-inline-flex align-items-center gap-2 mb-3">
+          <span class="badge px-3 py-1 rounded-pill font-weight-bold" 
+                style="background: rgba(225, 29, 72, 0.25); border: 1px solid var(--bb-border); color: #fda4af;">
+            <i class="bi bi-droplet-fill heartbeat-glow mr-1 text-danger"></i> BLOOD LOGISTICS COMMAND
+          </span>
+          <span class="badge px-3 py-1 rounded-pill" 
+                style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #a7f3d0;">
+            <span class="radar-blip mr-1"></span> LIVE PIPELINE ACTIVE
+          </span>
+        </div>
+        <h1 class="font-weight-bold mb-2 display-6 text-white" style="letter-spacing: -0.5px;">
+          National Transfusion & Emergency Command Center
+        </h1>
+        <p class="lead mb-0 text-white-50" style="font-size: 1.05rem; max-width: 650px;">
+          Central telemetry for patient emergency matching, voluntary lifesaver availability, and certified camp verifications across India.
+        </p>
+      </div>
+
+      <div class="col-lg-4 text-lg-right mt-4 mt-lg-0">
+        <div class="d-inline-flex flex-column align-items-lg-end p-3 rounded-4" 
+             style="background: rgba(5, 7, 13, 0.85); border: 1px solid var(--bb-border); box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="text-white font-weight-bold" style="font-family: 'JetBrains Mono', monospace;">24x7 DISPATCH</span>
+            <span class="badge badge-success px-2 py-0">READY</span>
+          </div>
+          <span class="text-danger font-weight-bold fs-5" style="font-family: 'JetBrains Mono', monospace;">+91 7091379965</span>
+          <small class="text-white-50 mt-1">Universal Compatibility Engine v2.4</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Live Telemetry HUD Counters -->
+  <div class="row g-3 mb-4">
+    <!-- Active Donors -->
+    <div class="col-xl-2 col-md-4 col-6">
+      <div class="metric-hud-card">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <small class="text-muted text-uppercase font-weight-bold" style="font-size: 0.72rem;">Active Donors</small>
+          <div class="rounded-circle p-2 d-flex align-items-center justify-content-center text-success" 
+               style="background: rgba(16, 185, 129, 0.12); width: 34px; height: 34px;">
+            <i class="bi bi-heart-pulse-fill"></i>
+          </div>
+        </div>
+        <div class="metric-hud-value text-success">{{ stats.total_donors }}</div>
+        <small class="text-muted" style="font-size: 0.75rem;"><i class="bi bi-arrow-up-right text-success mr-1"></i>Ready to Donate</small>
+      </div>
+    </div>
+
+    <!-- Total Requests -->
+    <div class="col-xl-2 col-md-4 col-6">
+      <div class="metric-hud-card">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <small class="text-muted text-uppercase font-weight-bold" style="font-size: 0.72rem;">Total Requests</small>
+          <div class="rounded-circle p-2 d-flex align-items-center justify-content-center text-info" 
+               style="background: rgba(6, 182, 212, 0.12); width: 34px; height: 34px;">
+            <i class="bi bi-droplet-half"></i>
+          </div>
+        </div>
+        <div class="metric-hud-value text-info">{{ stats.total_requests }}</div>
+        <small class="text-muted" style="font-size: 0.75rem;">Lifetime Patients</small>
+      </div>
+    </div>
+
+    <!-- Pending Emergency Intake -->
+    <div class="col-xl-2 col-md-4 col-6">
+      <div class="metric-hud-card" style="border-left: 3px solid #f59e0b !important;">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <small class="text-warning text-uppercase font-weight-bold" style="font-size: 0.72rem;">Pending Requests</small>
+          <div class="rounded-circle p-2 d-flex align-items-center justify-content-center text-warning" 
+               style="background: rgba(245, 158, 11, 0.12); width: 34px; height: 34px;">
+            <i class="bi bi-hourglass-split"></i>
+          </div>
+        </div>
+        <div class="metric-hud-value text-warning">{{ stats.pending_requests }}</div>
+        <small class="text-warning" style="font-size: 0.75rem;"><i class="bi bi-exclamation-triangle-fill mr-1"></i>Needs Verification</small>
+      </div>
+    </div>
+
+    <!-- Total Drives Hosted -->
+    <div class="col-xl-2 col-md-4 col-6">
+      <div class="metric-hud-card">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <small class="text-muted text-uppercase font-weight-bold" style="font-size: 0.72rem;">Total Camps</small>
+          <div class="rounded-circle p-2 d-flex align-items-center justify-content-center text-cyan" 
+               style="background: rgba(6, 182, 212, 0.12); width: 34px; height: 34px; color: #38bdf8;">
+            <i class="bi bi-hospital"></i>
+          </div>
+        </div>
+        <div class="metric-hud-value" style="color: #38bdf8;">{{ stats.total_campaigns }}</div>
+        <small class="text-muted" style="font-size: 0.75rem;">Colleges & NGOs</small>
+      </div>
+    </div>
+
+    <!-- Pending Camps -->
+    <div class="col-xl-2 col-md-4 col-6">
+      <div class="metric-hud-card" style="border-left: 3px solid #e11d48 !important;">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <small class="text-danger text-uppercase font-weight-bold" style="font-size: 0.72rem;">Pending Camps</small>
+          <div class="rounded-circle p-2 d-flex align-items-center justify-content-center text-danger" 
+               style="background: rgba(225, 29, 72, 0.12); width: 34px; height: 34px;">
+            <i class="bi bi-calendar-check"></i>
+          </div>
+        </div>
+        <div class="metric-hud-value text-danger">{{ stats.pending_campaigns }}</div>
+        <small class="text-danger" style="font-size: 0.75rem;">Awaiting Approval</small>
+      </div>
+    </div>
+
+    <!-- Total System Users -->
+    <div class="col-xl-2 col-md-4 col-6">
+      <div class="metric-hud-card">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <small class="text-muted text-uppercase font-weight-bold" style="font-size: 0.72rem;">User Accounts</small>
+          <div class="rounded-circle p-2 d-flex align-items-center justify-content-center text-secondary" 
+               style="background: rgba(255, 255, 255, 0.08); width: 34px; height: 34px; color: #ffffff;">
+            <i class="bi bi-people-fill"></i>
+          </div>
+        </div>
+        <div class="metric-hud-value text-white">{{ stats.total_users }}</div>
+        <small class="text-muted" style="font-size: 0.75rem;">Platform Members</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Operational Real-Life Healthcare Action Banners -->
+  <div class="row g-3 mb-4">
+    <!-- Urgent Patient Pipeline Card -->
+    <div class="col-md-4">
+      <div class="hud-panel p-4 position-relative overflow-hidden text-white" 
+           style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(136, 19, 55, 0.7)), url('{{ url_for('static', filename='images/blood-test.jpg') }}') center/cover;">
+        <div class="d-flex flex-column justify-content-between" style="min-height: 165px;">
+          <div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="badge px-2 py-1 rounded-pill" style="background: rgba(225, 29, 72, 0.3); border: 1px solid var(--bb-border); color: #fda4af;">
+                <i class="bi bi-broadcast me-1"></i> Patient Queue
+              </span>
+              <span class="badge badge-blood-critical">{{ stats.pending_requests }} Critical</span>
+            </div>
+            <h5 class="font-weight-bold mb-1 text-white">Emergency Blood Pipeline</h5>
+            <p class="small text-white-50 mb-0">Audit patient requisitions & assign urgent donors.</p>
+          </div>
+          <div class="mt-3">
+            <a href="{{ url_for('bloodrequest.index_view') }}" class="btn btn-sm btn-command-action">
+              Inspect Queue <i class="bi bi-arrow-right ml-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Verified Voluntary Donor Registry Card -->
+    <div class="col-md-4">
+      <div class="hud-panel p-4 position-relative overflow-hidden text-white" 
+           style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(6, 95, 70, 0.7)), url('{{ url_for('static', filename='images/donor-care.jpg') }}') center/cover;">
+        <div class="d-flex flex-column justify-content-between" style="min-height: 165px;">
+          <div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="badge px-2 py-1 rounded-pill" style="background: rgba(16, 185, 129, 0.3); border: 1px solid rgba(16, 185, 129, 0.5); color: #a7f3d0;">
+                <i class="bi bi-shield-check me-1"></i> 100% Voluntary
+              </span>
+              <span class="badge badge-status-approved">{{ stats.total_donors }} Available</span>
+            </div>
+            <h5 class="font-weight-bold mb-1 text-white">Voluntary Donor Network</h5>
+            <p class="small text-white-50 mb-0">Manage donor profiles, contact lines & availability.</p>
+          </div>
+          <div class="mt-3">
+            <a href="{{ url_for('donor.index_view') }}" class="btn btn-sm btn-command-action" style="background: linear-gradient(135deg, #059669, #047857);">
+              Audit Donors <i class="bi bi-arrow-right ml-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Certified Donation Drives Card -->
+    <div class="col-md-4">
+      <div class="hud-panel p-4 position-relative overflow-hidden text-white" 
+           style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 58, 138, 0.7)), url('{{ url_for('static', filename='images/blood-donation-drive.jpg') }}') center/cover;">
+        <div class="d-flex flex-column justify-content-between" style="min-height: 165px;">
+          <div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="badge px-2 py-1 rounded-pill" style="background: rgba(37, 99, 235, 0.3); border: 1px solid rgba(37, 99, 235, 0.5); color: #bfdbfe;">
+                <i class="bi bi-hospital me-1"></i> Campus Drives
+              </span>
+              <span class="badge badge-status-pending">{{ stats.pending_campaigns }} Pending</span>
+            </div>
+            <h5 class="font-weight-bold mb-1 text-white">Campus & NGO Drives</h5>
+            <p class="small text-white-50 mb-0">Approve upcoming donation camps & attendee sheets.</p>
+          </div>
+          <div class="mt-3">
+            <a href="{{ url_for('campaign.index_view') }}" class="btn btn-sm btn-command-action" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">
+              Manage Camps <i class="bi bi-arrow-right ml-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Real-Time Telemetry Moderation Tables -->
+  <div class="row g-4">
+    <!-- Urgent Patient Requisitions Table -->
+    <div class="col-lg-6">
+      <div class="hud-panel">
+        <div class="hud-panel-header d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-2">
+            <div class="rounded-circle p-2 d-flex align-items-center justify-content-center text-danger" 
+                 style="background: rgba(225, 29, 72, 0.15); width: 36px; height: 36px;">
+              <i class="bi bi-heart-pulse-fill"></i>
+            </div>
+            <div>
+              <h5 class="font-weight-bold mb-0 text-white">Live Patient Blood Intake</h5>
+              <small class="text-white-50">Urgent hospital transfusion requests</small>
+            </div>
+          </div>
+          <a href="{{ url_for('bloodrequest.index_view') }}" class="btn btn-sm btn-command-outline rounded-pill">
+            All Records <i class="bi bi-chevron-right ml-1"></i>
+          </a>
+        </div>
+
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Patient</th>
+                  <th>Blood Group</th>
+                  <th>Hospital Location</th>
+                  <th>Status</th>
+                  <th class="text-right pr-4">Triage Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for r in recent_requests %}
+                <tr>
+                  <td class="font-weight-bold text-white align-middle">
+                    {{ r.patient_name }}
+                    <br><small class="text-white-50 font-weight-normal"><i class="bi bi-telephone-fill mr-1 text-danger"></i>{{ r.contact_phone }}</small>
+                  </td>
+                  <td class="align-middle">
+                    <span class="badge-blood-critical font-weight-bold">{{ r.blood_group_required }}</span>
+                    <small class="text-white-50 ml-1">({{ r.units_required }} units)</small>
+                  </td>
+                  <td class="align-middle text-white-50 small">
+                    <strong class="text-white d-block">{{ r.hospital_name[:20] }}</strong>
+                    <span><i class="bi bi-geo-alt-fill text-danger mr-1"></i>{{ r.city }}</span>
+                  </td>
+                  <td class="align-middle">
+                    {% if r.status == 'Pending' %}
+                      <span class="badge-status-pending">● Pending</span>
+                    {% elif r.status == 'Approved' %}
+                      <span class="badge-status-approved">● Approved</span>
+                    {% elif r.status == 'Fulfilled' %}
+                      <span class="badge badge-info px-2 py-1">● Fulfilled</span>
+                    {% else %}
+                      <span class="badge-blood-critical">● Rejected</span>
+                    {% endif %}
+                  </td>
+                  <td class="align-middle text-right pr-4">
+                    <div class="btn-group btn-group-sm">
+                      <a href="{{ url_for('admin_approve_blood_request', req_id=r.id) }}" class="btn btn-sm btn-success" title="Approve Request">✓</a>
+                      <a href="{{ url_for('admin_reject_blood_request', req_id=r.id) }}" class="btn btn-sm btn-danger" title="Reject Request">✗</a>
+                      <a href="{{ url_for('admin_fulfill_blood_request', req_id=r.id) }}" class="btn btn-sm btn-info" title="Mark Fulfilled">✔</a>
+                    </div>
+                  </td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="5" class="text-center py-4 text-white-50">
+                    <i class="bi bi-check2-circle text-success fs-3 d-block mb-1"></i>
+                    All patient blood requests have been reviewed and dispatched.
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Community Blood Drives Moderation Table -->
+    <div class="col-lg-6">
+      <div class="hud-panel">
+        <div class="hud-panel-header d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-2">
+            <div class="rounded-circle p-2 d-flex align-items-center justify-content-center text-cyan" 
+                 style="background: rgba(6, 182, 212, 0.15); width: 36px; height: 36px; color: #38bdf8;">
+              <i class="bi bi-hospital"></i>
+            </div>
+            <div>
+              <h5 class="font-weight-bold mb-0 text-white">Community Drives Telemetry</h5>
+              <small class="text-white-50">Camp approvals & attendee rosters</small>
+            </div>
+          </div>
+          <a href="{{ url_for('campaign.index_view') }}" class="btn btn-sm btn-command-outline rounded-pill">
+            All Drives <i class="bi bi-chevron-right ml-1"></i>
+          </a>
+        </div>
+
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Camp Title</th>
+                  <th>Host Institution</th>
+                  <th>City</th>
+                  <th>Status</th>
+                  <th class="text-right pr-4">Verification</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for c in recent_campaigns %}
+                <tr>
+                  <td class="font-weight-bold text-white align-middle">
+                    {{ c.title[:22] }}
+                    <br><small class="text-white-50 font-weight-normal"><i class="bi bi-calendar-event text-danger mr-1"></i>{{ c.date.strftime('%d %b %Y') }}</small>
+                  </td>
+                  <td class="align-middle text-white-50 small">
+                    <strong class="text-white d-block">{{ c.host_name or '—' }}</strong>
+                    <span>{{ c.host_type }}</span>
+                  </td>
+                  <td class="align-middle text-white-50 small">
+                    <i class="bi bi-geo-alt-fill text-danger mr-1"></i>{{ c.city }}
+                  </td>
+                  <td class="align-middle">
+                    {% if c.status == 'Pending' %}
+                      <span class="badge-status-pending">● Pending</span>
+                    {% elif c.status == 'Approved' %}
+                      <span class="badge-status-approved">● Live</span>
+                    {% else %}
+                      <span class="badge-blood-critical">● Rejected</span>
+                    {% endif %}
+                  </td>
+                  <td class="align-middle text-right pr-4">
+                    <div class="btn-group btn-group-sm">
+                      <a href="{{ url_for('admin_approve_campaign', campaign_id=c.id) }}" class="btn btn-sm btn-success" title="Approve & Publish">✓ Live</a>
+                      <a href="{{ url_for('admin_reject_campaign', campaign_id=c.id) }}" class="btn btn-sm btn-danger" title="Reject Camp">✗</a>
+                    </div>
+                  </td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="5" class="text-center py-4 text-white-50">
+                    <i class="bi bi-calendar2-check text-info fs-3 d-block mb-1"></i>
+                    No pending donation drives awaiting review.
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

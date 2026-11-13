@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BloodBridge — Healthcare & Voluntary Blood Logistics Network</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom Healthcare Styling -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- 1. Emergency Hotline Topbar -->
+    <div class="topbar-emergency">
+        <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <i class="bi bi-telephone-inbound-fill me-2"></i>24/7 Emergency Blood Dispatch Hotline: 
+                <a href="tel:+917091379965" class="fw-bold ms-1 text-decoration-underline">+91 7091379965</a>
+                <span class="ms-3 d-none d-md-inline"><i class="bi bi-shield-fill-check me-1"></i>Verified Medical Response Network</span>
+            </div>
+            <div class="d-none d-lg-flex gap-3">
+                <a href="{{ url_for('blood_banks') }}"><i class="bi bi-hospital me-1"></i>National Blood Banks</a>
+                <a href="#about"><i class="bi bi-info-circle me-1"></i>How It Works</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Clean Clinical Navigation Bar -->
+    <nav id="mainNavbar" class="navbar navbar-expand-lg navbar-clinical sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+                <i class="bi bi-droplet-fill me-2 heartbeat"></i>
+                <span>Blood<span style="color: #0f172a;">Bridge</span></span>
+            </a>
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center gap-1">
+                    <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#blood-groups">Compatibility</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#campaigns">Drives</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('find_donor') }}">Find Donors</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('request_blood') }}">Request Blood</a></li>
+
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('become_donor') }}">Donate Blood</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('profile') }}"><i class="bi bi-person-circle me-1"></i>{{ current_user.username }}</a></li>
+                        <li class="nav-item"><a class="nav-link text-danger" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i></a></li>
+                    {% else %}
+                        <li class="nav-item ms-lg-2"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
+                        <li class="nav-item ms-lg-1">
+                            <a class="nav-link btn-nav-primary" href="{{ url_for('register') }}">Join Network</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="container mt-3">
+        {% for message in messages %}
+          <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm" role="alert">
+            <i class="bi bi-info-circle me-2"></i>{{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- 3. Hero Section (Medical Editorial Layout with Photography) -->
+    <header id="home" class="hero-medical">
+        <div class="container position-relative z-1">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <span class="hero-badge-pill mb-4">
+                        <i class="bi bi-heart-pulse-fill"></i> India's Lifesaver Network
+                    </span>
+                    <h1 class="hero-title mb-4">
+                        Exceptional Care, Instant Donors For Every Patient.
+                    </h1>
+                    <p class="hero-lead mb-4">
+                        Connecting verified voluntary blood donors with critical hospital patients in real-time. Transparent, verified, and 100% voluntary.
+                    </p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a href="{{ url_for('find_donor') }}" class="btn btn-outline-white">
+                            <i class="bi bi-search"></i> Find a Donor
+                        </a>
+                        <a href="{{ url_for('become_donor') }}" class="btn btn-primary-red">
+                            <i class="bi bi-droplet-fill"></i> Register as Donor
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-image-wrapper">
+                        <!-- Floating Badge 1 (Rating / Satisfaction) -->
+                        <div class="floating-stat-badge top-badge">
+                            <div class="rounded-circle bg-danger bg-opacity-10 p-2 text-danger">
+                                <i class="bi bi-star-fill text-warning fs-5"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-0">4.9/5 Trust Rating</h6>
+                                <small class="text-muted">Over 25,000+ Lifesavers</small>
+                            </div>
+                        </div>
+
+                        <!-- Blood Donation Focused Portrait Image -->
+                        <div class="hero-image-container">
+                            <img src="{{ url_for('static', filename='images/hero-doctor.jpg') }}" alt="Blood Donation LifeFlow" class="hero-doctor-img">
+                        </div>
+
+                        <!-- Floating Badge 2 (Live Network) -->
+                        <div class="floating-stat-badge bottom-badge">
+                            <div class="rounded-circle bg-success bg-opacity-10 p-2 text-success">
+                                <i class="bi bi-check2-circle fs-4"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-0">100% Verified Community</h6>
+                                <small class="text-muted">Instant Hospital Matching</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 4. Hero Quick Stats Strip (Floats over Hero) -->
+    <div class="container">
+        <div class="hero-stats-strip">
+            <div class="row g-4 text-center align-items-center">
+                <div class="col-6 col-md-3 border-end">
+                    <h3 class="fw-bold mb-1" style="color: var(--primary-red);">10,000+</h3>
+                    <p class="text-muted mb-0 small text-uppercase fw-semibold">Active Donors</p>
+                </div>
+                <div class="col-6 col-md-3 border-end">
+                    <h3 class="fw-bold mb-1" style="color: var(--primary-red);">25,000+</h3>
+                    <p class="text-muted mb-0 small text-uppercase fw-semibold">Lives Saved</p>
+                </div>
+                <div class="col-6 col-md-3 border-end">
+                    <h3 class="fw-bold mb-1" style="color: var(--primary-red);">500+</h3>
+                    <p class="text-muted mb-0 small text-uppercase fw-semibold">Camps Hosted</p>
+                </div>
+                <div class="col-6 col-md-3">
+                    <h3 class="fw-bold mb-1" style="color: var(--primary-red);">150+</h3>
+                    <p class="text-muted mb-0 small text-uppercase fw-semibold">Indian Cities</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Editorial About / Partner Section -->
+    <section id="about" class="py-5 mt-5">
+        <div class="container py-4">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <div class="editorial-image-frame">
+                        <img src="{{ url_for('static', filename='images/about-medical.jpg') }}" alt="Medical Team" class="editorial-img">
+                        <div class="editorial-badge-overlay">
+                            <div class="d-flex align-items-center gap-3">
+                                <i class="bi bi-hospital fs-2 text-danger"></i>
+                                <div>
+                                    <h6 class="fw-bold mb-0 text-dark">Premier Medical Collaboration</h6>
+                                    <small class="text-muted">Partnered with leading government & private hospitals</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <span class="section-tag">About BloodBridge</span>
+                    <h2 class="section-heading">Your Trusted Partner For <span class="highlight">Lifelong Healthcare</span></h2>
+                    <p class="section-description mb-4">
+                        BloodBridge bridges the communication gap between voluntary donors, emergency patients, and blood drive organizers across India. We ensure zero delays when urgent transfusion units are required.
+                    </p>
+
+                    <div class="benefit-list-item">
+                        <div class="benefit-icon-box">
+                            <i class="bi bi-lightning-charge-fill"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1 text-dark">Zero-Latency Matching</h5>
+                            <p class="text-muted mb-0 small">Locate matching voluntary donors in your district within seconds with direct WhatsApp and phone connectivity.</p>
+                        </div>
+                    </div>
+
+                    <div class="benefit-list-item">
+                        <div class="benefit-icon-box">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1 text-dark">Verified Medical Standards</h5>
+                            <p class="text-muted mb-0 small">All patient requisitions and public donation drives are verified by healthcare moderators.</p>
+                        </div>
+                    </div>
+
+                    <div class="benefit-list-item">
+                        <div class="benefit-icon-box">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1 text-dark">Community Driven Drives</h5>
+                            <p class="text-muted mb-0 small">Universities, NGOs, and medical colleges can host blood donation camps with attendee roster tracking.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <a href="{{ url_for('find_donor') }}" class="btn btn-primary-red">
+                            Explore Verified Donors <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. Advanced Healthcare Services Grid (Photo Cards) -->
+    <section id="services" class="py-5" style="background-color: var(--surface-subtle);">
+        <div class="container py-4">
+            <div class="text-center mb-5">
+                <span class="section-tag">Clinical Services</span>
+                <h2 class="section-heading">Advanced Healthcare <span class="highlight">Services</span></h2>
+                <p class="section-description mx-auto">
+                    Modernized blood logistics services built to save lives during critical emergency windows.
+                </p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Service 1 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="medical-service-card">
+                        <div class="service-img-wrapper">
+                            <img src="{{ url_for('static', filename='images/blood-test.jpg') }}" alt="Blood Compatibility">
+                            <span class="service-badge-pill">Clinical Testing</span>
+                        </div>
+                        <div class="service-card-body">
+                            <h4>Donor Directory</h4>
+                            <p>Filter voluntary donors instantly by exact blood type (A+, B+, O-, etc.) and your nearest city.</p>
+                            <a href="{{ url_for('find_donor') }}" class="fw-bold text-decoration-none" style="color: var(--primary-red);">
+                                Find Donors <i class="bi bi-chevron-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 2 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="medical-service-card">
+                        <div class="service-img-wrapper">
+                            <img src="{{ url_for('static', filename='images/doctor-team.jpg') }}" alt="Emergency Blood Intake">
+                            <span class="service-badge-pill">Emergency Dispatch</span>
+                        </div>
+                        <div class="service-card-body">
+                            <h4>Urgent Requisitions</h4>
+                            <p>Submit emergency blood requirements for hospitalized patients with real-time status tracking.</p>
+                            <a href="{{ url_for('request_blood') }}" class="fw-bold text-decoration-none" style="color: var(--primary-red);">
+                                Post Requirement <i class="bi bi-chevron-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 3 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="medical-service-card">
+                        <div class="service-img-wrapper">
+                            <img src="{{ url_for('static', filename='images/blood-donation-drive.jpg') }}" alt="Community Donation Drives">
+                            <span class="service-badge-pill">Community Camps</span>
+                        </div>
+                        <div class="service-card-body">
+                            <h4>Donation Drives</h4>
+                            <p>Participate in or organize certified university and NGO blood donation camps across India.</p>
+                            <a href="#campaigns" class="fw-bold text-decoration-none" style="color: var(--primary-red);">
+                                View Drives <i class="bi bi-chevron-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 4 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="medical-service-card">
+                        <div class="service-img-wrapper">
+                            <img src="{{ url_for('static', filename='images/donor-care.jpg') }}" alt="Donor Healthcare">
+                            <span class="service-badge-pill">Lifesaver Pass</span>
+                        </div>
+                        <div class="service-card-body">
+                            <h4>Donor Health Pass</h4>
+                            <p>Track your lifetime donation history, certificates, and eligibility dates on your digital profile.</p>
+                            <a href="{{ url_for('profile') }}" class="fw-bold text-decoration-none" style="color: var(--primary-red);">
+                                View Profile <i class="bi bi-chevron-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. Blood Group Compatibility Grid -->
+    <section id="blood-groups" class="py-5 blood-matrix-section">
+        <div class="container py-4 position-relative z-1">
+            <div class="text-center mb-5">
+                <span class="section-tag">Compatibility Matrix</span>
+                <h2 class="section-heading">Blood <span class="highlight">Group Compatibility</span></h2>
+                <p class="section-description mx-auto">
+                    Verify compatible donor and recipient matches before coordinating emergency transfusions.
+                </p>
+            </div>
+
+            <div class="row g-3">
+                <!-- A+ -->
+                <div class="col-6 col-md-3">
+                    <div class="blood-group-badge-card">
+                        <div class="blood-type-display">A+</div>
+                        <p class="fw-semibold text-dark mb-1 small">Can donate to:</p>
+                        <span class="badge bg-danger mb-2">A+, AB+</span>
+                        <p class="text-muted mb-0 small">Receives: A+, A-, O+, O-</p>
+                    </div>
+                </div>
+                <!-- A- -->
+                <div class="col-6 col-md-3">
+                    <div class="blood-group-badge-card">
+                        <div class="blood-type-display">A-</div>
+                        <p class="fw-semibold text-dark mb-1 small">Can donate to:</p>
+                        <span class="badge bg-danger mb-2">A+, A-, AB+, AB-</span>
+                        <p class="text-muted mb-0 small">Receives: A-, O-</p>
+                    </div>
+                </div>
+                <!-- B+ -->
+                <div class="col-6 col-md-3">
+                    <div class="blood-group-badge-card">
+                        <div class="blood-type-display">B+</div>
+                        <p class="fw-semibold text-dark mb-1 small">Can donate to:</p>
+                        <span class="badge bg-danger mb-2">B+, AB+</span>
+                        <p class="text-muted mb-0 small">Receives: B+, B-, O+, O-</p>
+                    </div>
+                </div>
+                <!-- B- -->
+                <div class="col-6 col-md-3">
+                    <div class="blood-group-badge-card">
+                        <div class="blood-type-display">B-</div>
+                        <p class="fw-semibold text-dark mb-1 small">Can donate to:</p>
+                        <span class="badge bg-danger mb-2">B+, B-, AB+, AB-</span>
+                        <p class="text-muted mb-0 small">Receives: B-, O-</p>
+                    </div>
+                </div>
+                <!-- AB+ -->
+                <div class="col-6 col-md-3">
+                    <div class="blood-group-badge-card">
+                        <div class="blood-type-display">AB+</div>
+                        <p class="fw-semibold text-dark mb-1 small">Can donate to:</p>
+                        <span class="badge bg-danger mb-2">AB+ Only</span>
+                        <p class="text-muted mb-0 small">Universal Recipient</p>
+                    </div>
+                </div>
+                <!-- AB- -->
+                <div class="col-6 col-md-3">
+                    <div class="blood-group-badge-card">
+                        <div class="blood-type-display">AB-</div>
+                        <p class="fw-semibold text-dark mb-1 small">Can donate to:</p>
+                        <span class="badge bg-danger mb-2">AB+, AB-</span>
+                        <p class="text-muted mb-0 small">Receives: A-, B-, AB-, O-</p>
+                    </div>
+                </div>
+                <!-- O+ -->
+                <div class="col-6 col-md-3">
+                    <div class="blood-group-badge-card">
+                        <div class="blood-type-display">O+</div>
+                        <p class="fw-semibold text-dark mb-1 small">Can donate to:</p>
+                        <span class="badge bg-danger mb-2">O+, A+, B+, AB+</span>
+                        <p class="text-muted mb-0 small">Receives: O+, O-</p>
+                    </div>
+                </div>
+                <!-- O- -->
+                <div class="col-6 col-md-3">
+                    <div class="blood-group-badge-card" style="border: 2px solid var(--primary-red);">
+                        <div class="blood-type-display">O-</div>
+                        <span class="badge bg-warning text-dark mb-1">Universal Donor ⭐</span>
+                        <p class="fw-semibold text-dark mb-1 small">Can donate to:</p>
+                        <span class="badge bg-success mb-2">Everyone</span>
+                        <p class="text-muted mb-0 small">Receives: O- Only</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. Upcoming Blood Donation Drives -->
+    <section id="campaigns" class="py-5" style="background-color: var(--surface-subtle);">
+        <div class="container py-4">
+            <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-3">
+                <div>
+                    <span class="section-tag">Community Camps</span>
+                    <h2 class="section-heading mb-0">Upcoming Blood <span class="highlight">Donation Drives</span></h2>
+                </div>
+                <a href="{{ url_for('host_drive') }}" class="btn btn-outline-red">
+                    <i class="bi bi-plus-circle me-1"></i> Host a Drive
+                </a>
+            </div>
+
+            <div class="row g-4">
+                {% if campaigns %}
+                    {% for campaign in campaigns %}
+                    <div class="col-md-6">
+                        <div class="campaign-card-clinical">
+                            <div class="campaign-date-badge">
+                                <div class="day">{{ campaign.date.strftime('%d') }}</div>
+                                <div class="month">{{ campaign.date.strftime('%b') }}</div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h5 class="fw-bold text-dark mb-1">{{ campaign.title }}</h5>
+                                <p class="text-muted small mb-1">
+                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ campaign.location }}, {{ campaign.city }}
+                                </p>
+                                <p class="text-muted small mb-0">
+                                    <i class="bi bi-clock-fill text-danger me-1"></i>{{ campaign.time_start.strftime('%I:%M %p') }} - {{ campaign.time_end.strftime('%I:%M %p') }}
+                                </p>
+                            </div>
+                            <div>
+                                <a href="{{ url_for('register_campaign', campaign_id=campaign.id) }}" class="btn btn-sm btn-primary-red">
+                                    Register
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12">
+                        <div class="p-5 text-center bg-white rounded-4 border">
+                            <i class="bi bi-calendar2-x fs-1 text-muted mb-3 d-block"></i>
+                            <h5 class="fw-bold text-dark">No Active Camps Right Now</h5>
+                            <p class="text-muted">Check back soon or submit a proposal to host a blood donation camp at your institution.</p>
+                            <a href="{{ url_for('host_drive') }}" class="btn btn-primary-red">Host A Camp Drive</a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. Medical Specialists / LifeFlow Advisory Board -->
+    <section class="py-5">
+        <div class="container py-4">
+            <div class="text-center mb-5">
+                <span class="section-tag">Medical Advisory</span>
+                <h2 class="section-heading">Meet Our <span class="highlight">Healthcare Experts</span></h2>
+                <p class="section-description mx-auto">
+                    Guided by board-certified hematologists and transfusion medicine specialists.
+                </p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="specialist-card">
+                        <div class="specialist-img-box">
+                            <img src="{{ url_for('static', filename='images/doctor1.jpg') }}" alt="Dr. Rajesh Mehra">
+                        </div>
+                        <div class="specialist-body">
+                            <h5>Dr. Rajesh Mehra</h5>
+                            <span>Chief Transfusion Officer, AIIMS</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="specialist-card">
+                        <div class="specialist-img-box">
+                            <img src="{{ url_for('static', filename='images/doctor2.jpg') }}" alt="Dr. Priya Singhania">
+                        </div>
+                        <div class="specialist-body">
+                            <h5>Dr. Priya Singhania</h5>
+                            <span>Head of Hematology, Apollo Healthcare</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="specialist-card">
+                        <div class="specialist-img-box">
+                            <img src="{{ url_for('static', filename='images/doctor3.jpg') }}" alt="Dr. Alok Verma">
+                        </div>
+                        <div class="specialist-body">
+                            <h5>Dr. Alok Verma</h5>
+                            <span>Director of Red Cross Emergency Network</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. Call-to-Action Doctor Banner -->
+    <section class="py-5">
+        <div class="container">
+            <div class="cta-banner-crimson">
+                <div class="row align-items-center g-4 position-relative z-1">
+                    <div class="col-lg-7">
+                        <span class="badge bg-white text-danger px-3 py-2 rounded-pill fw-bold mb-3">
+                            <i class="bi bi-heart-fill me-1"></i> Be Someone's Hero
+                        </span>
+                        <h2 class="display-5 fw-bold mb-3">Every Blood Donation Can Save Up To 3 Lives.</h2>
+                        <p class="text-white text-opacity-90 lead mb-4">
+                            Join thousands of regular donors across India. Your single act of kindness provides life-saving hope to trauma victims, thalassemia patients, and surgical emergencies.
+                        </p>
+                        <div class="d-flex gap-3 flex-wrap">
+                            <a href="{{ url_for('become_donor') }}" class="btn btn-outline-white">
+                                <i class="bi bi-droplet-fill"></i> Become a Donor Today
+                            </a>
+                            <a href="tel:+917091379965" class="btn btn-primary-red">
+                                <i class="bi bi-telephone-fill"></i> Emergency Helpline
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 text-center">
+                        <img src="{{ url_for('static', filename='images/cta-doctor.jpg') }}" alt="Doctor in scrubs" class="cta-doctor-cutout">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 11. Testimonials & Feedback -->
+    <section class="py-5" style="background-color: var(--surface-subtle);">
+        <div class="container py-4">
+            <div class="text-center mb-5">
+                <span class="section-tag">Testimonials</span>
+                <h2 class="section-heading">Real Stories, <span class="highlight">Lasting Impact</span></h2>
+                <p class="section-description mx-auto">Read how BloodBridge connected lives in times of urgent need.</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feedback-card-white">
+                        <div class="feedback-rating">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                        <p class="feedback-quote">"When my mother needed blood urgently for surgery, BloodBridge connected us with two O- donors within 35 minutes. Truly a lifesaver."</p>
+                        <div class="feedback-author">
+                            <img src="https://ui-avatars.com/api/?name=Rahul+Verma&background=dc2626&color=fff&bold=true" alt="Rahul Verma">
+                            <div>
+                                <h6 class="fw-bold mb-0 text-dark">Rahul Verma</h6>
+                                <small class="text-muted">Recipient Family, Mumbai</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="feedback-card-white">
+                        <div class="feedback-rating">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                        <p class="feedback-quote">"I regularly donate every 3 months. The dashboard lets me track camps and coordinates everything without any annoying spam calls."</p>
+                        <div class="feedback-author">
+                            <img src="https://ui-avatars.com/api/?name=Priya+Sharma&background=dc2626&color=fff&bold=true" alt="Priya Sharma">
+                            <div>
+                                <h6 class="fw-bold mb-0 text-dark">Priya Sharma</h6>
+                                <small class="text-muted">15x Donor, New Delhi</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="feedback-card-white">
+                        <div class="feedback-rating">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                        <p class="feedback-quote">"Our university hosted a 500-student donation drive. The camp roster management and attendee tracking made the whole logistics seamless."</p>
+                        <div class="feedback-author">
+                            <img src="https://ui-avatars.com/api/?name=Dr+Arun+Nair&background=dc2626&color=fff&bold=true" alt="Dr. Arun Nair">
+                            <div>
+                                <h6 class="fw-bold mb-0 text-dark">Dr. Arun Nair</h6>
+                                <small class="text-muted">Drive Organizer, Bengaluru</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 12. Contact Section -->
+    <section id="contact" class="py-5">
+        <div class="container py-4">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-5">
+                    <span class="section-tag">Emergency Contact</span>
+                    <h2 class="section-heading">Get In Touch With Our <span class="highlight">Medical Team</span></h2>
+                    <p class="text-muted mb-4">
+                        Have an emergency requisition or want to collaborate with BloodBridge for a university or corporate blood camp? Reach out directly.
+                    </p>
+
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-danger bg-opacity-10 p-3 text-danger me-3">
+                            <i class="bi bi-geo-alt-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark">National Headquarters</h6>
+                            <small class="text-muted">Connaught Place, New Delhi - 110001</small>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-danger bg-opacity-10 p-3 text-danger me-3">
+                            <i class="bi bi-telephone-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark">Direct Helpline</h6>
+                            <small class="text-muted">+91 7091379965 (24x7 Priority Support)</small>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-danger bg-opacity-10 p-3 text-danger me-3">
+                            <i class="bi bi-envelope-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark">Official Communication</h6>
+                            <small class="text-muted">contact@bloodbridge.in</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="clinical-input-card">
+                        <h4 class="fw-bold text-dark mb-3">Send a Medical Invalidation / Inquiry</h4>
+                        <form action="{{ url_for('contact') }}" method="POST">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label text-dark small fw-semibold">Your Full Name</label>
+                                    <input type="text" name="name" class="form-control clinical-control" placeholder="e.g. Ananya Sen" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-dark small fw-semibold">Email Address</label>
+                                    <input type="email" name="email" class="form-control clinical-control" placeholder="ananya@example.com" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-dark small fw-semibold">Phone Number</label>
+                                    <input type="tel" name="phone" class="form-control clinical-control" placeholder="+91 98765 43210">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-dark small fw-semibold">City</label>
+                                    <input type="text" name="city" class="form-control clinical-control" placeholder="e.g. Pune, Delhi, Mumbai">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label text-dark small fw-semibold">Message or Requisition Details</label>
+                                    <textarea name="message" class="form-control clinical-control" rows="4" placeholder="How can our lifesaver network assist you?" required></textarea>
+                                </div>
+                                <div class="col-12 mt-3">
+                                    <button type="submit" class="btn btn-primary-red w-100 py-3">
+                                        <i class="bi bi-send-fill me-1"></i> Transmit Message
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 13. Clinical Enterprise Footer -->
+    <footer class="footer-clinical">
+        <div class="container">
+            <div class="row g-4 mb-5">
+                <div class="col-lg-4 col-md-6">
+                    <a class="navbar-brand d-flex align-items-center mb-3 text-white fw-bold fs-4 text-decoration-none" href="#">
+                        <i class="bi bi-droplet-fill me-2 text-danger"></i>
+                        <span>BloodBridge</span>
+                    </a>
+                    <p class="small text-muted mb-4">
+                        A voluntary blood donation network bridging hospitals, emergency patients, and donors across India. 100% free, community-powered lifesaver logistics.
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="footer-social-btn"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="footer-social-btn"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" class="footer-social-btn"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="footer-social-btn"><i class="bi bi-instagram"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <h5>Quick Navigation</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#home">Home</a></li>
+                        <li class="mb-2"><a href="#about">About Platform</a></li>
+                        <li class="mb-2"><a href="#services">Our Services</a></li>
+                        <li class="mb-2"><a href="#blood-groups">Blood Groups</a></li>
+                        <li class="mb-2"><a href="#campaigns">Donation Drives</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <h5>Emergency Portals</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{{ url_for('find_donor') }}">Search Donors</a></li>
+                        <li class="mb-2"><a href="{{ url_for('request_blood') }}">Request Blood</a></li>
+                        <li class="mb-2"><a href="{{ url_for('become_donor') }}">Register as Donor</a></li>
+                        <li class="mb-2"><a href="{{ url_for('blood_banks') }}">Blood Banks</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <h5>Emergency Newsletter</h5>
+                    <p class="small text-muted mb-3">Subscribe to receive instant broadcast alerts when rare blood units are required in your city.</p>
+                    <form action="{{ url_for('newsletter') }}" method="POST" class="d-flex gap-2">
+                        <input type="email" name="email" class="form-control clinical-control border-0" placeholder="Enter your email" required>
+                        <button type="submit" class="btn btn-primary-red px-3">
+                            <i class="bi bi-send-fill"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="border-top border-secondary border-opacity-50 pt-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 small">
+                <p class="mb-0 text-white" style="opacity: 0.9;">&copy; 2026 BloodBridge Healthcare Network. All rights reserved.</p>
+                <p class="mb-0 text-white" style="opacity: 0.9;">Empowering Healthcare with <i class="bi bi-heart-fill text-danger heartbeat"></i> in India</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top" id="backToTop">
+        <i class="bi bi-arrow-up-short"></i>
+    </a>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Back to top & navbar scroll state
+        const backToTop = document.getElementById('backToTop');
+        const mainNavbar = document.getElementById('mainNavbar');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 250) {
+                backToTop.classList.add('active');
+                mainNavbar.classList.add('scrolled');
+            } else {
+                backToTop.classList.remove('active');
+                mainNavbar.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>

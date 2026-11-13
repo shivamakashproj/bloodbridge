@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Hosted Blood Drives — BloodBridge</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom Theme -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .hoster-hero-banner {
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.92), rgba(37, 99, 235, 0.85)),
+                        url('{{ url_for('static', filename='images/blood-donation-drive.jpg') }}') center/cover;
+            color: #ffffff;
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .camp-organizer-card {
+            background: #ffffff;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            padding: 26px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .camp-organizer-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+            border-color: #3b82f6;
+        }
+
+        .camp-info-box {
+            background: var(--surface-subtle);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. Emergency Topbar -->
+    <div class="topbar-emergency">
+        <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <i class="bi bi-telephone-inbound-fill me-2"></i>Hoster & Coordinator Hotline: 
+                <a href="tel:+917091379965" class="fw-bold ms-1 text-decoration-underline">+91 7091379965</a>
+            </div>
+            <div class="d-none d-md-flex gap-3">
+                <a href="{{ url_for('profile') }}"><i class="bi bi-person-circle me-1"></i>Member Dashboard</a>
+                <a href="{{ url_for('index') }}"><i class="bi bi-house me-1"></i>Home</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-clinical sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+                <i class="bi bi-droplet-fill me-2 heartbeat"></i>
+                <span>Blood<span style="color: #0f172a;">Bridge</span></span>
+            </a>
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <a href="{{ url_for('profile') }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">Dashboard</a>
+                <a href="{{ url_for('host_drive') }}" class="btn btn-sm btn-primary-red">Host New Camp</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-danger rounded-pill px-3">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 3. Header Hero Banner with Real Camp Photo -->
+    <div class="container mt-4">
+        <div class="hoster-hero-banner">
+            <div class="row align-items-center g-4 position-relative z-1">
+                <div class="col-lg-8">
+                    <span class="hero-badge-pill mb-3" style="background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.4);">
+                        <i class="bi bi-building"></i> Institutional Organizer Portal
+                    </span>
+                    <h1 class="display-6 fw-bold mb-2">My Hosted Blood Donation Drives</h1>
+                    <p class="mb-0 text-white text-opacity-90 lead" style="font-size: 1.05rem;">
+                        Manage camp venues, view administrative approval statuses, and download registered donor attendee rosters.
+                    </p>
+                </div>
+                <div class="col-lg-4 text-center text-lg-end d-none d-lg-block">
+                    <a href="{{ url_for('host_drive') }}" class="btn btn-outline-white">
+                        <i class="bi bi-plus-circle me-1"></i> Submit New Drive
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Campaigns Cards Grid -->
+    <div class="container py-5 my-2">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for cat, msg in messages %}
+              <div class="alert alert-{{ cat if cat != 'message' else 'info' }} alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
+                <i class="bi bi-info-circle-fill me-2 text-primary"></i> {{ msg }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        {% if campaigns %}
+        <div class="row g-4">
+            {% for c in campaigns %}
+            <div class="col-md-6">
+                <div class="camp-organizer-card">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <span class="section-tag mb-1">{{ c.host_type }} Camp</span>
+                                <h4 class="fw-bold text-dark mb-0">{{ c.title }}</h4>
+                            </div>
+                            <div>
+                                {% if c.status == 'Pending' %}
+                                    <span class="badge bg-warning text-dark px-3 py-1 rounded-pill">● Pending Review</span>
+                                {% elif c.status == 'Approved' %}
+                                    <span class="badge bg-success px-3 py-1 rounded-pill">● Live on Platform</span>
+                                {% else %}
+                                    <span class="badge bg-danger px-3 py-1 rounded-pill">● Rejected</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="camp-info-box mb-4 small text-secondary">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span><i class="bi bi-building me-1 text-primary"></i>Organizer Host:</span>
+                                <strong class="text-dark">{{ c.host_name }}</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span><i class="bi bi-calendar-event me-1 text-danger"></i>Date & Timings:</span>
+                                <strong class="text-dark">{{ c.date.strftime('%d %B %Y') }} ({{ c.time_start.strftime('%I:%M %p') }} - {{ c.time_end.strftime('%I:%M %p') }})</strong>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span><i class="bi bi-geo-alt-fill me-1 text-danger"></i>Venue Location:</span>
+                                <strong class="text-dark">{{ c.location }}, {{ c.city }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="rounded-circle bg-light p-2 text-danger border">
+                                <i class="bi bi-people-fill"></i>
+                            </span>
+                            <div>
+                                <strong class="text-dark fs-5">{{ c.registrations|length }}</strong>
+                                <small class="text-muted d-block" style="font-size: 0.75rem;">Registered Donors</small>
+                            </div>
+                        </div>
+
+                        <a href="{{ url_for('view_campaign_registrations', campaign_id=c.id) }}" class="btn btn-primary-red">
+                            <i class="bi bi-card-checklist me-1"></i> View Attendee Roster
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="p-5 text-center bg-white rounded-4 border shadow-sm">
+            <img src="{{ url_for('static', filename='images/blood-donation-drive.jpg') }}" alt="Blood Drive" class="rounded-4 mb-3 shadow" style="width: 200px; height: 120px; object-fit: cover;">
+            <h4 class="fw-bold text-dark">No Blood Camps Organized Yet</h4>
+            <p class="text-muted mb-4 max-w-500 mx-auto">Colleges, hospitals, corporate teams, and NGOs can organize volunteer blood drives to help save multiple lives.</p>
+            <a href="{{ url_for('host_drive') }}" class="btn btn-primary-red px-4">
+                <i class="bi bi-plus-circle me-1"></i> Submit a Blood Drive Proposal
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- 5. Footer -->
+    <footer class="footer-clinical mt-5">
+        <div class="container text-center">
+            <p class="mb-1 text-white fw-bold">BloodBridge Institutional Network</p>
+            <p class="small text-muted mb-0">&copy; 2026 BloodBridge India. Connecting communities with healthcare centers.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>National Blood Banks Directory — BloodBridge</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom Healthcare Styling -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .bank-card {
+            background: #ffffff;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 26px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .bank-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--border-red);
+        }
+        .bank-info-box {
+            background: var(--surface-subtle);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+        }
+        .badge-open-247 {
+            background: #dcfce7;
+            color: #15803d;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: var(--radius-pill);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. Emergency Helpline Topbar -->
+    <div class="topbar-emergency">
+        <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <i class="bi bi-telephone-inbound-fill me-2"></i>24/7 Emergency Blood Dispatch Hotline: 
+                <a href="tel:+917091379965" class="fw-bold ms-1 text-decoration-underline">+91 7091379965</a>
+            </div>
+            <div class="d-none d-md-flex gap-3">
+                <a href="{{ url_for('index') }}"><i class="bi bi-house me-1"></i>Back to Home</a>
+                <a href="{{ url_for('find_donor') }}"><i class="bi bi-search me-1"></i>Search Voluntary Donors</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Clean Clinical Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-clinical sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+                <i class="bi bi-droplet-fill me-2 heartbeat"></i>
+                <span>Blood<span style="color: #0f172a;">Bridge</span></span>
+            </a>
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <a href="{{ url_for('find_donor') }}" class="btn btn-outline-red btn-sm">Find Donor</a>
+                <a href="{{ url_for('request_blood') }}" class="btn btn-primary-red btn-sm">Emergency Request</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 3. Header Hero Banner -->
+    <div class="py-5" style="background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 40%, #dc2626 100%); color: #ffffff;">
+        <div class="container text-center py-4">
+            <span class="hero-badge-pill mb-3">
+                <i class="bi bi-hospital"></i> Verified Healthcare Directory
+            </span>
+            <h1 class="display-5 fw-bold mb-3">National Public & Partnered <span class="text-white text-decoration-underline">Blood Banks</span></h1>
+            <p class="lead mb-0 mx-auto text-white text-opacity-90" style="max-width: 650px; font-size: 1.05rem;">
+                Official 24/7 Government institutes, Red Cross chapters, and premier multispecialty hospital transfusion centers across India.
+            </p>
+        </div>
+    </div>
+
+    <!-- 4. Directory Grid -->
+    <div class="container py-5 my-3">
+        <div class="row g-4">
+            
+            <!-- AIIMS New Delhi -->
+            <div class="col-md-6 col-lg-4">
+                <div class="bank-card">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="section-tag mb-0">Govt. Medical Institute</span>
+                            <span class="badge-open-247"><i class="bi bi-clock-fill"></i> 24x7 Open</span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">AIIMS Main Blood Bank</h4>
+                        <p class="text-muted small mb-3">
+                            <i class="bi bi-geo-alt-fill text-danger me-1"></i>Ansari Nagar, New Delhi - 110029
+                        </p>
+                        <div class="bank-info-box mb-4 small text-secondary">
+                            <div><strong class="text-dark">Components:</strong> Packed RBC, Platelets, FFP, Cryo</div>
+                            <div class="mt-1"><strong class="text-dark">Helpline:</strong> +91 11 2658 8500</div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="tel:+911126588500" class="btn btn-outline-red flex-grow-1 text-center">
+                            <i class="bi bi-telephone-fill me-1"></i> Call Center
+                        </a>
+                        <a href="https://maps.google.com/?q=AIIMS+New+Delhi+Blood+Bank" target="_blank" class="btn btn-primary-red px-3" title="Map Directions">
+                            <i class="bi bi-compass"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Indian Red Cross Society -->
+            <div class="col-md-6 col-lg-4">
+                <div class="bank-card">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="section-tag mb-0">Red Cross Society</span>
+                            <span class="badge-open-247"><i class="bi bi-clock-fill"></i> 24x7 Open</span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">Indian Red Cross National HQ</h4>
+                        <p class="text-muted small mb-3">
+                            <i class="bi bi-geo-alt-fill text-danger me-1"></i>1 Red Cross Road, Connaught Place, New Delhi
+                        </p>
+                        <div class="bank-info-box mb-4 small text-secondary">
+                            <div><strong class="text-dark">Components:</strong> Whole Blood, Platelets, PRBC</div>
+                            <div class="mt-1"><strong class="text-dark">Helpline:</strong> +91 11 2371 6441</div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="tel:+911123716441" class="btn btn-outline-red flex-grow-1 text-center">
+                            <i class="bi bi-telephone-fill me-1"></i> Call Center
+                        </a>
+                        <a href="https://maps.google.com/?q=Red+Cross+Blood+Bank+New+Delhi" target="_blank" class="btn btn-primary-red px-3" title="Map Directions">
+                            <i class="bi bi-compass"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tata Memorial Hospital Mumbai -->
+            <div class="col-md-6 col-lg-4">
+                <div class="bank-card">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="section-tag mb-0">Cancer Research Center</span>
+                            <span class="badge-open-247"><i class="bi bi-clock-fill"></i> 24x7 Open</span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">Tata Memorial Blood Center</h4>
+                        <p class="text-muted small mb-3">
+                            <i class="bi bi-geo-alt-fill text-danger me-1"></i>Parel, Mumbai - 400012
+                        </p>
+                        <div class="bank-info-box mb-4 small text-secondary">
+                            <div><strong class="text-dark">Components:</strong> SDP Platelets, FFP, Packed Cells</div>
+                            <div class="mt-1"><strong class="text-dark">Helpline:</strong> +91 22 2417 7000</div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="tel:+912224177000" class="btn btn-outline-red flex-grow-1 text-center">
+                            <i class="bi bi-telephone-fill me-1"></i> Call Center
+                        </a>
+                        <a href="https://maps.google.com/?q=Tata+Memorial+Blood+Bank+Mumbai" target="_blank" class="btn btn-primary-red px-3" title="Map Directions">
+                            <i class="bi bi-compass"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Narayana Health City Bengaluru -->
+            <div class="col-md-6 col-lg-4">
+                <div class="bank-card">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="section-tag mb-0">Multi-Speciality Center</span>
+                            <span class="badge-open-247"><i class="bi bi-clock-fill"></i> 24x7 Open</span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">Narayana Health Blood Bank</h4>
+                        <p class="text-muted small mb-3">
+                            <i class="bi bi-geo-alt-fill text-danger me-1"></i>Bommasandra, Bengaluru - 560099
+                        </p>
+                        <div class="bank-info-box mb-4 small text-secondary">
+                            <div><strong class="text-dark">Components:</strong> All Components, Apheresis Units</div>
+                            <div class="mt-1"><strong class="text-dark">Helpline:</strong> +91 80 7122 2222</div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="tel:+918071222222" class="btn btn-outline-red flex-grow-1 text-center">
+                            <i class="bi bi-telephone-fill me-1"></i> Call Center
+                        </a>
+                        <a href="https://maps.google.com/?q=Narayana+Health+City+Bengaluru+Blood+Bank" target="_blank" class="btn btn-primary-red px-3" title="Map Directions">
+                            <i class="bi bi-compass"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Apollo Hospitals Chennai -->
+            <div class="col-md-6 col-lg-4">
+                <div class="bank-card">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="section-tag mb-0">Apollo Healthcare</span>
+                            <span class="badge-open-247"><i class="bi bi-clock-fill"></i> 24x7 Open</span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">Apollo Main Blood Center</h4>
+                        <p class="text-muted small mb-3">
+                            <i class="bi bi-geo-alt-fill text-danger me-1"></i>Greams Road, Thousand Lights, Chennai
+                        </p>
+                        <div class="bank-info-box mb-4 small text-secondary">
+                            <div><strong class="text-dark">Components:</strong> Cryo, Plasma, Packed Red Cells</div>
+                            <div class="mt-1"><strong class="text-dark">Helpline:</strong> +91 44 2829 0200</div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="tel:+914428290200" class="btn btn-outline-red flex-grow-1 text-center">
+                            <i class="bi bi-telephone-fill me-1"></i> Call Center
+                        </a>
+                        <a href="https://maps.google.com/?q=Apollo+Hospital+Greams+Road+Blood+Bank" target="_blank" class="btn btn-primary-red px-3" title="Map Directions">
+                            <i class="bi bi-compass"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SMS Hospital Jaipur -->
+            <div class="col-md-6 col-lg-4">
+                <div class="bank-card">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="section-tag mb-0">Govt. Medical College</span>
+                            <span class="badge-open-247"><i class="bi bi-clock-fill"></i> 24x7 Open</span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">SMS Hospital Blood Bank</h4>
+                        <p class="text-muted small mb-3">
+                            <i class="bi bi-geo-alt-fill text-danger me-1"></i>JLN Marg, Jaipur - 302004
+                        </p>
+                        <div class="bank-info-box mb-4 small text-secondary">
+                            <div><strong class="text-dark">Components:</strong> Whole Blood, Platelet Rich Plasma</div>
+                            <div class="mt-1"><strong class="text-dark">Helpline:</strong> +91 141 251 8222</div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="tel:+911412518222" class="btn btn-outline-red flex-grow-1 text-center">
+                            <i class="bi bi-telephone-fill me-1"></i> Call Center
+                        </a>
+                        <a href="https://maps.google.com/?q=SMS+Hospital+Blood+Bank+Jaipur" target="_blank" class="btn btn-primary-red px-3" title="Map Directions">
+                            <i class="bi bi-compass"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 5. Clinical Enterprise Footer -->
+    <footer class="footer-clinical">
+        <div class="container text-center">
+            <p class="mb-1 text-white fw-bold">BloodBridge Healthcare Network</p>
+            <p class="small text-white mb-0" style="opacity: 0.9;">&copy; 2026 BloodBridge India. Connecting lives 24/7 across the nation.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

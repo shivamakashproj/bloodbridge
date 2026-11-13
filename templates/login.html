@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% if role == 'admin' %}Admin Sign In — BloodBridge
+        {% elif role == 'hoster' %}Organizer Sign In — BloodBridge
+        {% else %}Donor & Citizen Sign In — BloodBridge{% endif %}
+    </title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        :root {
+            --donor-theme: #dc2626;
+            --hoster-theme: #2563eb;
+            --admin-theme: #d97706;
+        }
+
+        /* Clean Light Background with Soft Red/Blue Glow */
+        body {
+            color: #0f172a;
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem 1rem;
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        /* Screen Background Image with Gentle Overlay for Perfect Card Contrast */
+        .role-donor .auth-container {
+            background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(254, 226, 226, 0.25)),
+                              url("{{ url_for('static', filename='images/donor-screen-bg.jpg') }}");
+        }
+        .role-hoster .auth-container {
+            background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(219, 234, 254, 0.25)),
+                              url("{{ url_for('static', filename='images/hoster-screen-bg.jpg') }}");
+        }
+        .role-admin .auth-container {
+            background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(254, 243, 199, 0.25)),
+                              url("{{ url_for('static', filename='images/admin-screen-bg.jpg') }}");
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 960px;
+            border-radius: 24px;
+            overflow: hidden;
+            background: #ffffff;
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.15), 0 0 30px rgba(0, 0, 0, 0.05);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Left Visual Photography Side */
+        .auth-visual-side {
+            position: relative;
+            background-size: cover;
+            background-position: center center;
+            min-height: 520px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px;
+            color: #ffffff;
+        }
+
+        /* Donor visual: Blood Donation Image */
+        .auth-visual-donor {
+            background-image: linear-gradient(135deg, rgba(153, 27, 27, 0.88), rgba(220, 38, 38, 0.82)),
+                              url("{{ url_for('static', filename='images/donor-auth.jpg') }}");
+        }
+
+        /* Hoster visual: Drive Camp Image */
+        .auth-visual-hoster {
+            background-image: linear-gradient(135deg, rgba(30, 58, 138, 0.88), rgba(37, 99, 235, 0.82)),
+                              url("{{ url_for('static', filename='images/hoster-auth.jpg') }}");
+        }
+
+        /* Admin visual: Medical Admin Center Image */
+        .auth-visual-admin {
+            background-image: linear-gradient(135deg, rgba(120, 53, 15, 0.88), rgba(217, 119, 6, 0.82)),
+                              url("{{ url_for('static', filename='images/admin-auth.jpg') }}");
+        }
+
+        /* Role Switcher Tabs */
+        .role-switcher-nav {
+            display: flex;
+            background: #f1f5f9;
+            padding: 5px;
+            border-radius: 999px;
+            gap: 4px;
+            margin-bottom: 1.75rem;
+            border: 1px solid #e2e8f0;
+        }
+        .role-switcher-tab {
+            flex: 1;
+            text-align: center;
+            padding: 0.5rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+        .role-switcher-tab:hover {
+            color: #0f172a;
+        }
+        .role-switcher-tab.active-donor {
+            background: #dc2626;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+        }
+        .role-switcher-tab.active-hoster {
+            background: #2563eb;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+        }
+        .role-switcher-tab.active-admin {
+            background: #d97706;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+        }
+
+        /* Clean Form Controls */
+        .clean-auth-input {
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            color: #0f172a;
+            transition: all 0.2s ease;
+        }
+        .clean-auth-input:focus {
+            background: #ffffff;
+            border-color: #dc2626;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+            outline: none;
+        }
+        .role-hoster .clean-auth-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+        .role-admin .clean-auth-input:focus {
+            border-color: #d97706;
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+        }
+
+        /* Buttons */
+        .btn-auth-submit {
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #ffffff;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+        }
+        .btn-donor {
+            background: #dc2626;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.35);
+        }
+        .btn-donor:hover {
+            background: #b91c1c;
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+        .btn-hoster {
+            background: #2563eb;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35);
+        }
+        .btn-hoster:hover {
+            background: #1d4ed8;
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+        .btn-admin {
+            background: #d97706;
+            box-shadow: 0 4px 15px rgba(217, 119, 6, 0.35);
+        }
+        .btn-admin:hover {
+            background: #b45309;
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="role-{{ role }}">
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="row g-0">
+                
+                <!-- Left Visual Photography Side (Role Specific) -->
+                <div class="col-lg-5 d-none d-lg-flex auth-visual-side 
+                    {% if role == 'admin' %}auth-visual-admin
+                    {% elif role == 'hoster' %}auth-visual-hoster
+                    {% else %}auth-visual-donor{% endif %}">
+                    
+                    <div>
+                        <a href="{{ url_for('index') }}" class="text-white text-decoration-none d-flex align-items-center mb-4">
+                            <i class="bi bi-droplet-fill fs-3 me-2"></i>
+                            <span class="fs-4 fw-bold">BloodBridge</span>
+                        </a>
+
+                        {% if role == 'admin' %}
+                            <span class="badge bg-warning text-dark px-3 py-1 rounded-pill fw-bold mb-3">ADMIN CONTROL</span>
+                            <h3 class="fw-bold mb-2">Hospital & System Governance</h3>
+                            <p class="text-white text-opacity-90 small mb-0">Review camp requests and manage live blood requisitions.</p>
+                        {% elif role == 'hoster' %}
+                            <span class="badge bg-primary text-white px-3 py-1 rounded-pill fw-bold mb-3">CAMP ORGANIZER</span>
+                            <h3 class="fw-bold mb-2">Host Certified Blood Drives</h3>
+                            <p class="text-white text-opacity-90 small mb-0">Coordinate volunteer blood camps and track donor attendance.</p>
+                        {% else %}
+                            <span class="badge bg-danger text-white px-3 py-1 rounded-pill fw-bold mb-3">DONOR / CITIZEN</span>
+                            <h3 class="fw-bold mb-2">Save Lives, Donate Blood</h3>
+                            <p class="text-white text-opacity-90 small mb-0">Connect directly with patients and book your donation slots.</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top border-white border-opacity-25 small text-white text-opacity-75">
+                        <span><i class="bi bi-shield-check me-1"></i> 256-Bit Encrypted</span>
+                        <a href="{{ url_for('index') }}" class="text-white text-decoration-none"><i class="bi bi-house me-1"></i>Home</a>
+                    </div>
+                </div>
+
+                <!-- Right Form Side -->
+                <div class="col-lg-7 p-4 p-md-5 d-flex flex-column justify-content-center">
+                    
+                    <!-- Role Switcher Tabs -->
+                    <div class="role-switcher-nav">
+                        <a href="{{ url_for('login', role='donor') }}" 
+                           class="role-switcher-tab {% if role == 'donor' %}active-donor{% endif %}">
+                            <i class="bi bi-heart-fill"></i> Donor
+                        </a>
+                        <a href="{{ url_for('login', role='hoster') }}" 
+                           class="role-switcher-tab {% if role == 'hoster' %}active-hoster{% endif %}">
+                            <i class="bi bi-building-fill"></i> Hoster
+                        </a>
+                        <a href="{{ url_for('login', role='admin') }}" 
+                           class="role-switcher-tab {% if role == 'admin' %}active-admin{% endif %}">
+                            <i class="bi bi-shield-lock-fill"></i> Admin
+                        </a>
+                    </div>
+
+                    <!-- Clean Header -->
+                    <div class="mb-4">
+                        <h4 class="fw-bold text-dark mb-1">
+                            {% if role == 'admin' %}Admin Sign In
+                            {% elif role == 'hoster' %}Drive Organizer Sign In
+                            {% else %}Sign In to BloodBridge{% endif %}
+                        </h4>
+                        <p class="text-muted small mb-0">Enter your credentials to continue to your dashboard.</p>
+                    </div>
+
+                    <!-- Flash Messages -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                      {% if messages %}
+                        {% for cat, msg in messages %}
+                          <div class="alert alert-{{ cat if cat != 'message' else 'danger' }} alert-dismissible fade show small py-2 mb-3" role="alert">
+                            {{ msg }}
+                            <button type="button" class="btn-close py-2" data-bs-dismiss="alert"></button>
+                          </div>
+                        {% endfor %}
+                      {% endif %}
+                    {% endwith %}
+
+                    <!-- Form -->
+                    <form method="POST" action="{{ url_for('login', role=role) }}">
+                        <div class="mb-3">
+                            <label class="form-label text-dark small fw-semibold">Username</label>
+                            <input type="text" name="username" class="form-control clean-auth-input" placeholder="Enter username" required autofocus>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label text-dark small fw-semibold mb-0">Password</label>
+                                <a href="{{ url_for('reset_password_request') }}" class="small text-muted text-decoration-none">Forgot password?</a>
+                            </div>
+                            <input type="password" name="password" class="form-control clean-auth-input" placeholder="Enter password" required>
+                        </div>
+
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" class="form-check-input" id="rememberMe" name="remember">
+                            <label class="form-check-label text-muted small" for="rememberMe">Remember me</label>
+                        </div>
+
+                        <button type="submit" class="btn btn-auth-submit w-100 mb-3
+                            {% if role == 'admin' %}btn-admin
+                            {% elif role == 'hoster' %}btn-hoster
+                            {% else %}btn-donor{% endif %}">
+                            <i class="bi bi-box-arrow-in-right"></i> Sign In
+                        </button>
+                    </form>
+
+                    <!-- Bottom Registration Link -->
+                    <div class="text-center pt-2">
+                        {% if role == 'admin' %}
+                            <small class="text-muted"><i class="bi bi-lock me-1"></i> Admin accounts are provisioned by system policy.</small>
+                        {% elif role == 'hoster' %}
+                            <small class="text-muted">Want to organize camps? <a href="{{ url_for('register', role='hoster') }}" class="fw-bold text-primary text-decoration-none">Register Organization</a></small>
+                        {% else %}
+                            <small class="text-muted">Don't have an account? <a href="{{ url_for('register', role='customer') }}" class="fw-bold text-danger text-decoration-none">Create Donor Account</a></small>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
